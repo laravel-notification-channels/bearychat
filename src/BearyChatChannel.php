@@ -1,13 +1,13 @@
 <?php
 
-namespace NotificationChannels\:channel_namespace;
+namespace NotificationChannels\BearyChat;
 
-use NotificationChannels\:channel_namespace\Exceptions\CouldNotSendNotification;
-use NotificationChannels\:channel_namespace\Events\MessageWasSent;
-use NotificationChannels\:channel_namespace\Events\SendingMessage;
+use NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification;
+use NotificationChannels\BearyChat\Events\MessageWasSent;
+use NotificationChannels\BearyChat\Events\SendingMessage;
 use Illuminate\Notifications\Notification;
 
-class :service_nameChannel
+class BearyChatChannel
 {
     public function __construct()
     {
@@ -20,7 +20,7 @@ class :service_nameChannel
      * @param mixed $notifiable
      * @param \Illuminate\Notifications\Notification $notification
      *
-     * @throws \NotificationChannels\:channel_namespace\Exceptions\CouldNotSendNotification
+     * @throws \NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification
      */
     public function send($notifiable, Notification $notification)
     {
