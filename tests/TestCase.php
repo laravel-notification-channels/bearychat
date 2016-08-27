@@ -4,9 +4,9 @@ namespace NotificationChannels\BearyChat\Test;
 
 use Orchestra\Testbench\TestCase as OrchestraCase;
 use Mockery;
-use ElfSundae\BearyChat\Client;
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Psr7\Response as HttpResponse;
 use ElfSundae\BearyChat\Laravel\ClientManager;
-use NotificationChannels\BearyChat\BearyChatChannel;
 
 class TestCase extends OrchestraCase
 {
@@ -19,18 +19,24 @@ class TestCase extends OrchestraCase
     {
         parent::setUp();
 
-        $this->clientManager = new ClientManager($this->app);
-
-        $this->assertInstanceOf(ClientManager::class, $this->clientManager);
-
-        $this->assertInstanceOf(Client::class, $this->clientManager->client());
+        $this->setupClientManager();
     }
 
-    protected function getEnvironmentSetUp($app)
+    public function tearDown()
     {
-        $app['config']->set('bearychat.default', 'testbench');
-        $app['config']->set('bearychat.clients.testbench', [
-            'webhook' => 'http://fake.endpoint',
-        ]);
+        Mockery::close();
+
+        parent::tearDown();
+    }
+
+    protected function setupClientManager()
+    {
+        $this->clientManager = Mockery::instanceMock(new ClientManager($this->app));
+        $this->clientManager->customHttpClient(function ($name) {
+            $httpClient = Mockery::mock(HttpClient::class);
+            $httpClient->shouldReceive('post')
+                ->andReturn(new HttpResponse(200));
+            return $httpClient;
+        });
     }
 }
