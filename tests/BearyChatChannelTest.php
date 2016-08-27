@@ -3,13 +3,10 @@
 namespace NotificationChannels\BearyChat\Test;
 
 use Mockery;
-use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Psr7\Response as HttpResponse;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Notifiable;
 use ElfSundae\BearyChat\Client;
 use ElfSundae\BearyChat\Message;
-use ElfSundae\BearyChat\MessageDefaults;
 use ElfSundae\BearyChat\Laravel\ClientManager;
 use NotificationChannels\BearyChat\BearyChatChannel;
 use NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification;
@@ -23,7 +20,8 @@ class BearyChatChannelTest extends TestCase
 
     public function testNotificationCanBeSent()
     {
-        $client = Mockery::mock(Client::class)->makePartial();
+        $client = $this->prepareClient();
+
         $client->shouldReceive('sendMessage')
             ->once()
             ->with(Mockery::on(function ($argument) {
@@ -31,37 +29,86 @@ class BearyChatChannelTest extends TestCase
             }))
             ->andReturn(true);
 
-        $this->clientManager->shouldReceive('client')->andReturn($client);
-
-        $channel = $this->getChannel();
-        $channel->send(new TestNotifiable(), new TestNotification);
+        $this->getChannel()
+            ->send(new TestNotifiable(), new TestNotification());
     }
 
     public function testCouldNotSendNotificationExceptionForInvalidMessage()
     {
         $this->setExpectedException(CouldNotSendNotification::class);
 
-        $channel = $this->getChannel();
-        $channel->send(new TestNotifiable(), new TestInvalidMessageNotification);
+        $this->getChannel()
+            ->send(new TestNotifiable(), new TestNotification('foo'));
     }
 
     public function testCouldNotSendNotificationExceptionForSendingFailed()
     {
         $this->setExpectedException(CouldNotSendNotification::class);
 
-        $client = Mockery::mock(Client::class)->makePartial();
+        $client = $this->prepareClient();
+
         $client->shouldReceive('sendMessage')
             ->andReturn(false);
 
-        $this->clientManager->shouldReceive('client')->andReturn($client);
+        $this->getChannel()
+            ->send(new TestNotifiable(), new TestNotification());
+    }
 
-        $channel = $this->getChannel();
-        $channel->send(new TestNotifiable(), new TestNotification);
+    public function testMessageWhenNotifiableGivesUser()
+    {
+        $client = $this->prepareClient();
+
+        $client->shouldReceive('sendMessage')
+            ->once()
+            ->with(Mockery::on(function ($message) {
+                return $message->getUser() === 'foo';
+            }))
+            ->andReturn(true);
+
+        $message = (new Message)->user('user');
+
+        $this->getChannel()
+            ->send(new TestNotifiable('@foo'), new TestNotification($message));
+    }
+
+    public function testMessageWhenNotifiableGivesChannel()
+    {
+        $client = $this->prepareClient();
+
+        $client->shouldReceive('sendMessage')
+            ->once()
+            ->with(Mockery::on(function ($message) {
+                return $message->getChannel() === 'foo';
+            }))
+            ->andReturn(true);
+
+        $message = (new Message)->channel('user');
+
+        $this->getChannel()
+            ->send(new TestNotifiable('#foo'), new TestNotification($message));
     }
 
     protected function getChannel()
     {
         return new BearyChatChannel($this->clientManager);
+    }
+
+    protected function getClient()
+    {
+        return Mockery::mock(Client::class)->makePartial();
+    }
+
+    protected function returnClientForClientManager($client)
+    {
+        $this->clientManager->shouldReceive('client')->andReturn($client);
+    }
+
+    protected function prepareClient()
+    {
+        $client = $this->getClient();
+        $this->returnClientForClientManager($client);
+
+        return $client;
     }
 }
 
@@ -69,24 +116,30 @@ class TestNotifiable
 {
     use Notifiable;
 
+    protected $route;
+
+    public function __construct($route = null)
+    {
+        $this->route = $route;
+    }
+
     public function routeNotificationForBearyChat()
     {
-        return 'user';
+        return $this->route;
     }
 }
 
 class TestNotification extends Notification
 {
-    public function toBearyChat($notifiable)
-    {
-        return (new Message)->text('text');
-    }
-}
+    protected $message;
 
-class TestInvalidMessageNotification extends Notification
-{
+    public function __construct($message = null)
+    {
+        $this->message = is_null($message) ? (new Message)->text('text') : $message;
+    }
+
     public function toBearyChat($notifiable)
     {
-        return 'foo';
+        return $this->message;
     }
 }
