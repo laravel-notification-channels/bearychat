@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use ElfSundae\BearyChat\Laravel\ClientManager;
 use ElfSundae\BearyChat\Client;
 use ElfSundae\BearyChat\Message;
+use ElfSundae\BearyChat\MessageDefaults;
 
 class BearyChatChannel
 {
@@ -47,6 +48,11 @@ class BearyChatChannel
         $client = $message->getClient();
 
         if ($route = $notifiable->routeNotificationFor('BearyChat')) {
+
+            // Route can be an user, a channel, a webhook endpoint,
+            // or a client name which correspond to one of the clients
+            // listed in the BearyChat configuration file.
+
             if (Str::startsWith($route, ['@', '#'])) {
                 $message->to($route);
             } elseif (Str::startsWith($route, ['http://', 'https://'])) {
@@ -56,9 +62,14 @@ class BearyChatChannel
             }
         }
 
+        // If the message is not created from a client, or the notifiable object
+        // provides a different client to send this message, we should obtain
+        // the client via the ClientManager and apply any message defaults from
+        // this client to the message instance.
+
         if (is_null($client) || isset($clientName)) {
             $client = $this->clientManager->client(isset($clientName) ? $clientName : null);
-            $message = $this->applyMessageDefaultsFromClient($client);
+            $message = $this->applyMessageDefaultsFromClient($client, $message);
         }
 
         if (! $client->sendMessage($message)) {
@@ -75,6 +86,36 @@ class BearyChatChannel
      */
     protected function applyMessageDefaultsFromClient($client, $message)
     {
+        static $globalDefaultsKeys = null;
+
+        if (is_null($globalDefaultsKeys)) {
+            $globalDefaultsKeys = [
+                MessageDefaults::CHANNEL,
+                MessageDefaults::USER,
+                MessageDefaults::MARKDOWN,
+                MessageDefaults::NOTIFICATION
+            ];
+        }
+
+        foreach ($globalDefaultsKeys as $key) {
+            $method = Str::studly($key);
+
+            if (method_exists($message, $getMethod = 'get'.$method)) {
+                if (is_null($message->{$getMethod}())) {
+                    $message->{$method}($client->getMessageDefaults($key));
+                }
+            }
+        }
+
+        if (
+            $attachmentColor = $client->getMessageDefaults(MessageDefaults::ATTACHMENT_COLOR) &&
+            $attachments = $message->getAttachments()
+        ) {
+            // foreach
+        }
+
+        // dd($message->toArray());
+
         return $message;
     }
 }
