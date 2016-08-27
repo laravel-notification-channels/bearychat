@@ -126,7 +126,6 @@ class BearyChatChannel
         }
 
         if (($attachmentColor = $client->getMessageDefaults(MessageDefaults::ATTACHMENT_COLOR))) {
-
             $attachmentDefaults = [
                 'color' => $attachmentColor,
             ];
