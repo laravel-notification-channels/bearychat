@@ -12,7 +12,7 @@ use ElfSundae\BearyChat\Laravel\ClientManager;
 use NotificationChannels\BearyChat\BearyChatChannel;
 use NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification;
 
-class BearyChatChannelTest extends \PHPUnit_Framework_TestCase
+class BearyChatChannelTest extends TestCase
 {
     public function testInstantiation()
     {
@@ -21,7 +21,7 @@ class BearyChatChannelTest extends \PHPUnit_Framework_TestCase
 
     protected function getChannel()
     {
-        return new BearyChatChannel(Mockery::mock(ClientManager::class));
+        return new BearyChatChannel($this->clientManager);
     }
 
     protected function getNotifiable()
