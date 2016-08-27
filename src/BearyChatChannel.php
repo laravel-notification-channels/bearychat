@@ -93,7 +93,7 @@ class BearyChatChannel
                 MessageDefaults::CHANNEL,
                 MessageDefaults::USER,
                 MessageDefaults::MARKDOWN,
-                MessageDefaults::NOTIFICATION
+                MessageDefaults::NOTIFICATION,
             ];
         }
 
@@ -108,13 +108,20 @@ class BearyChatChannel
         }
 
         if (
-            $attachmentColor = $client->getMessageDefaults(MessageDefaults::ATTACHMENT_COLOR) &&
-            $attachments = $message->getAttachments()
+            ($attachmentColor = $client->getMessageDefaults(MessageDefaults::ATTACHMENT_COLOR)) &&
+            ($attachments = $message->getAttachments())
         ) {
-            // foreach
-        }
+            $attachmentDefaults = [
+                'color' => $attachmentColor,
+            ];
 
-        // dd($message->toArray());
+            // First we apply attachment defaults from the client to this message instance,
+            // then call message's `setAttachments` method which can handle the message's
+            // attachment defaults.
+
+            $message->setAttachmentDefaults($attachmentDefaults + $message->getAttachmentDefaults());
+            $message->setAttachments($message->getAttachments());
+        }
 
         return $message;
     }
