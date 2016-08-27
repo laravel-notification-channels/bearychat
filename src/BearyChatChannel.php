@@ -84,7 +84,7 @@ class BearyChatChannel
      * @throws \NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification if the
      *             passed message is not an instance of \ElfSundae\BearyChat\Message
      */
-    protected function getMessage($notifiable, $notification)
+    protected function getMessage($notifiable, Notification $notification)
     {
         $message = $notification->toBearyChat($notifiable);
 
@@ -102,7 +102,7 @@ class BearyChatChannel
      * @param  \ElfSundae\BearyChat\Message  $message
      * @return \ElfSundae\BearyChat\Message
      */
-    protected function applyMessageDefaultsFromClient($client, $message)
+    protected function applyMessageDefaultsFromClient(Client $client, Message $message)
     {
         static $globalDefaultsKeys = null;
 
@@ -125,10 +125,8 @@ class BearyChatChannel
             }
         }
 
-        if (
-            ($attachmentColor = $client->getMessageDefaults(MessageDefaults::ATTACHMENT_COLOR)) &&
-            ($attachments = $message->getAttachments())
-        ) {
+        if (($attachmentColor = $client->getMessageDefaults(MessageDefaults::ATTACHMENT_COLOR))) {
+
             $attachmentDefaults = [
                 'color' => $attachmentColor,
             ];
