@@ -3,6 +3,7 @@
 namespace NotificationChannels\BearyChat;
 
 use Illuminate\Support\ServiceProvider;
+use ElfSundae\BearyChat\Laravel\ClientManager;
 
 class BearyChatServiceProvider extends ServiceProvider
 {
@@ -11,30 +12,18 @@ class BearyChatServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Bootstrap code here.
-
-        /**
-         * Here's some example code we use for the pusher package.
-
-        $this->app->when(Channel::class)
-            ->needs(Pusher::class)
-            ->give(function () {
-                $pusherConfig = config('broadcasting.connections.pusher');
-
-                return new Pusher(
-                    $pusherConfig['key'],
-                    $pusherConfig['secret'],
-                    $pusherConfig['app_id']
-                );
-            });
-         */
-
+        $this->app->when(BearyChatChannel::class)
+            ->needs(ClientManager::class)
+            ->give('bearychat');
     }
 
     /**
      * Register the application services.
+     *
+     * @return void
      */
     public function register()
     {
+        $this->app->register(\ElfSundae\BearyChat\Laravel\ServiceProvider::class);
     }
 }
