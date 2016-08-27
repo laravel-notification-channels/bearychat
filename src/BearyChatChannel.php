@@ -49,7 +49,7 @@ class BearyChatChannel
         if ($route = $notifiable->routeNotificationFor('BearyChat')) {
             if (Str::startsWith($route, ['@', '#'])) {
                 $message->to($route);
-            } else if (Str::startsWith($route, ['http://', 'https://'])) {
+            } elseif (Str::startsWith($route, ['http://', 'https://'])) {
                 $client = $client ? $client->webhook($route) : new Client($route);
             } else {
                 $clientName = $route;
