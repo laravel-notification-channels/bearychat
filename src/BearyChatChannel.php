@@ -134,8 +134,8 @@ class BearyChatChannel
             ];
 
             // First we apply attachment defaults from the client to this message instance,
-            // then call message's `setAttachments` method which can handle the message's
-            // attachment defaults.
+            // then reset message's attachments via its `setAttachments` method which can
+            // handle its attachment defaults.
 
             $message->setAttachmentDefaults($attachmentDefaults + $message->getAttachmentDefaults());
             $message->setAttachments($message->getAttachments());
