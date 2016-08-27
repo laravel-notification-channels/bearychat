@@ -2,9 +2,7 @@
 
 namespace NotificationChannels\BearyChat\Test;
 
-use Mockery;
 use ElfSundae\BearyChat\Message;
-use ElfSundae\BearyChat\Client;
 
 class MessageTest extends TestCase
 {
@@ -120,7 +118,7 @@ class MessageTest extends TestCase
             [
                 'title' => 'foo',
                 'text' => 'bar',
-            ]
+            ],
         ];
 
         $message->attachments($var);
@@ -155,7 +153,7 @@ class MessageTest extends TestCase
             'text' => 'foo',
             'title' => 'bar',
             'images' => [
-                ['url' => 'http://image.url']
+                ['url' => 'http://image.url'],
             ],
             'color' => 'red',
         ],

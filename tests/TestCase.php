@@ -36,6 +36,7 @@ class TestCase extends OrchestraCase
             $httpClient = Mockery::mock(HttpClient::class);
             $httpClient->shouldReceive('post')
                 ->andReturn(new HttpResponse(200));
+
             return $httpClient;
         });
     }
