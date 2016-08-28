@@ -2,13 +2,13 @@
 
 namespace NotificationChannels\BearyChat;
 
-use NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification;
-use Illuminate\Notifications\Notification;
-use Illuminate\Support\Str;
-use ElfSundae\BearyChat\Laravel\ClientManager;
 use ElfSundae\BearyChat\Client;
+use ElfSundae\BearyChat\Laravel\ClientManager;
 use ElfSundae\BearyChat\Message;
 use ElfSundae\BearyChat\MessageDefaults;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Str;
+use NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification;
 
 class BearyChatChannel
 {
