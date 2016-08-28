@@ -11,12 +11,10 @@
 
 This package makes it easy to send notifications using [BearyChat][] with Laravel 5.3.
 
-**:warning: Work In Progress**
-
 ## Contents
 
 - [Installation](#installation)
-  - [Setting up the BearyChat service](#setting-up-the-BearyChat-service)
+  - [Setting up the BearyChat service](#setting-up-the-bearychat-service)
 - [Usage](#usage)
   - [Basic Usage](#basic-usage)
   - [Routing Notifications](#routing-notifications)
@@ -138,7 +136,7 @@ $message = (new Message)
     ->to('@Boss');
 ```
 
-A notification uses the above Message will send the following payload:
+A notification uses the above Message instance will be sent with the following payload:
 
 ```json
 {
