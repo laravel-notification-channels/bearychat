@@ -40,6 +40,6 @@ class TestCase extends OrchestraCase
             return $httpClient;
         });
 
-        $this->clientManager = Mockery::instanceMock($clientManager);
+        $this->clientManager = Mockery::mock($clientManager);
     }
 }
