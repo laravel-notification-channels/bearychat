@@ -5,7 +5,6 @@ namespace NotificationChannels\BearyChat\Test;
 use Orchestra\Testbench\TestCase as OrchestraCase;
 use Mockery;
 use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Psr7\Response as HttpResponse;
 use ElfSundae\BearyChat\Laravel\ClientManager;
 
 class TestCase extends OrchestraCase
@@ -33,9 +32,12 @@ class TestCase extends OrchestraCase
     {
         $clientManager = new ClientManager($this->app);
         $clientManager->customHttpClient(function ($name) {
+            $response = class_exists('GuzzleHttp\Message\Response') ?
+                (new \GuzzleHttp\Message\Response(200)) :
+                (new \GuzzleHttp\Psr7\Response(200));
             $httpClient = Mockery::mock(HttpClient::class);
             $httpClient->shouldReceive('post')
-                ->andReturn(new HttpResponse(200));
+                ->andReturn($response);
 
             return $httpClient;
         });
