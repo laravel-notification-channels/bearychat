@@ -31,13 +31,15 @@ class TestCase extends OrchestraCase
 
     protected function setupClientManager()
     {
-        $this->clientManager = Mockery::instanceMock(new ClientManager($this->app));
-        $this->clientManager->customHttpClient(function ($name) {
+        $clientManager = new ClientManager($this->app);
+        $clientManager->customHttpClient(function ($name) {
             $httpClient = Mockery::mock(HttpClient::class);
             $httpClient->shouldReceive('post')
                 ->andReturn(new HttpResponse(200));
 
             return $httpClient;
         });
+
+        $this->clientManager = Mockery::instanceMock($clientManager);
     }
 }
