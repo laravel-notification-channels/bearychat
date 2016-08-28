@@ -16,9 +16,11 @@ This package makes it easy to send notifications using [BearyChat][] with Larave
 ## Contents
 
 - [Installation](#installation)
-	- [Setting up the BearyChat service](#setting-up-the-BearyChat-service)
+  - [Setting up the BearyChat service](#setting-up-the-BearyChat-service)
 - [Usage](#usage)
-	- [Available Message methods](#available-message-methods)
+  - [Basic Usage](#basic-usage)
+  - [Routing Notifications](#routing-notifications)
+  - [Available Message methods](#available-message-methods)
 - [Changelog](#changelog)
 - [Testing](#testing)
 - [Security](#security)
@@ -31,8 +33,8 @@ This package makes it easy to send notifications using [BearyChat][] with Larave
 
 You can install the package via [Composer][]:
 
-```
-composer require laravel-notification-channels/bearychat
+```sh
+$ composer require laravel-notification-channels/bearychat
 ```
 
 Once package is installed, you need to register the service provider by adding the following to the `providers` array in `config/app.php`:
@@ -41,15 +43,83 @@ Once package is installed, you need to register the service provider by adding t
 NotificationChannels\BearyChat\BearyChatServiceProvider::class,
 ```
 
+This package is based on [Laravel-BearyChat][], then you may publish the config file if you have not done yet:
+
+```sh
+$ php artisan vendor:publish --provider="ElfSundae\BearyChat\Laravel\ServiceProvider"
+```
+
 ### Setting up the BearyChat service
 
 You may create an Incoming Robot in your [BearyChat][] team account, and read the [payload format][Incoming].
 
 ## Usage
 
-Some code examples, make it clear how to use the package
+### Basic Usage
 
-### Available methods
+You can now use the channel in the `via()` method inside the Notification class.
+
+```php
+<?php
+
+namespace App\Notifications;
+
+use Illuminate\Notifications\Notification;
+use NotificationChannels\BearyChat\BearyChatChannel;
+use ElfSundae\BearyChat\Message;
+
+class InvoicePaid extends Notification
+{
+    public function via($notifiable)
+    {
+        return [BearyChatChannel::class];
+    }
+
+    public function toBearyChat($notifiable)
+    {
+        return (new Message)
+            ->text('foo')
+            ->add('bar');
+    }
+}
+```
+
+You can also use a BearyChat `Client`  to create the message for notification, and the client's message defaults will be used for creating this new `Message` instance.
+
+```php
+public function toBearyChat($notifiable)
+{
+    return bearychat('admin')->text('New VIP has been paid!');
+}
+```
+
+> + For more details about BearyChat `Client` and `Message`, please [read the documentation][PHP-BearyChat] of the BearyChat PHP package.
+> + For more details about `BearyChat` facade or `bearychat()` helper function, please [read the documentation][Laravel-BearyChat] of the original Laravel package.
+
+### Routing Notifications
+
+To route BearyChat notifications to the proper Robot, define a `routeNotificationForBearyChat` method on your notifiable entity. 
+
+```php
+class User extends Authenticatable
+{
+    use Notifiable;
+
+    public function routeNotificationForBearyChat()
+    {
+        return 'https://hook.bearychat.com/...';
+    }
+}
+```
+
+You can also route the user, channel or configured client in the `routeNotificationForBearyChat` method.
+
+- `'@Elf'` will route the notification to user "Elf".
+- `'#iOS-Dev'` will route the notification to channel "iOS-Dev".
+- `'http://webhook/url'` will route the notification to an Incoming Robot.
+- `'Server'` will route the notification via a client which named "Server" in your config file `config/bearychat.php`.
+
+### Available Message methods
 
 A list of all available options
 
@@ -84,4 +154,5 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [BearyChat]: https://bearychat.com
 [Composer]: https://getcomposer.org
 [Laravel-BearyChat]: https://github.com/ElfSundae/Laravel-BearyChat
+[PHP-BearyChat]: https://github.com/ElfSundae/BearyChat
 [Incoming]: https://bearychat.com/integrations/incoming
