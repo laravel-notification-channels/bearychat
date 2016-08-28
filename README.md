@@ -20,7 +20,7 @@ This package makes it easy to send notifications using [BearyChat][] with Larave
 - [Usage](#usage)
   - [Basic Usage](#basic-usage)
   - [Routing Notifications](#routing-notifications)
-  - [Available Message methods](#available-message-methods)
+  - [Available Message Methods](#available-message-methods)
 - [Changelog](#changelog)
 - [Testing](#testing)
 - [Security](#security)
@@ -117,11 +117,48 @@ You can also route the user, channel or configured client in the `routeNotificat
 - `'@Elf'` will route the notification to user "Elf".
 - `'#iOS-Dev'` will route the notification to channel "iOS-Dev".
 - `'http://webhook/url'` will route the notification to an Incoming Robot.
-- `'Server'` will route the notification via a client which named "Server" in your config file `config/bearychat.php`.
+- `'Server'` will route the notification via a client which named "Server" in your config file `config/bearychat.php`, and the message defaults of this client will be applied to the outgoing notification message.
 
-### Available Message methods
+### Available Message Methods
 
-A list of all available options
+- `text()` : (string) Message content.
+- `notification()` : (string) Message notification.
+- `markdown(true)` : (boolean) Indicates the message should be parsed as markdown syntax.
+- `add()` : (mixed) Add an attachment to the message. The parameter can be an payload array that contains all of attachment's fields. The parameters can also be attachment's fields that in order of "text", "title", "images" and "color".
+- `remove()` : (mixed) Remove attachment(s), you can pass an integer of attachment index, or an array of indices.
+- `channel()` : (string) The channel that the message should be sent to.
+- `user()` : (string) The user that the message should be sent to.
+- `to()` : (string) The target (user or channel) that the message should be sent to. The target may be started with "**@**" for sending to an user, and the channel's starter mark "**#**" is optional.
+
+```php
+$message = (new Message)
+    ->text('message content')
+    ->notification('notification for this message')
+    ->add('attachment content', 'attachment title', 'http://path/to/image', '#FF0000')
+    ->to('@Boss');
+```
+
+A notification uses the above Message will send the following payload:
+
+```json
+{
+    "text": "message content",
+    "notification": "notification for this message",
+    "user": "Boss",
+    "attachments": [
+        {
+            "text": "attachment content",
+            "title": "attachment title",
+            "images": [
+                {
+                    "url": "http://path/to/image"
+                }
+            ],
+            "color": "#FF0000"
+        }
+    ]
+}
+```
 
 ## Changelog
 
