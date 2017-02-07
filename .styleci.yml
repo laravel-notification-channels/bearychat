@@ -1,6 +1,6 @@
 preset: laravel
 
 disabled:
-  - phpdoc_align
+  - phpdoc_params
 
 linting: true
