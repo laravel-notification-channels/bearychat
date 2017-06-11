@@ -3,11 +3,10 @@
 namespace NotificationChannels\BearyChat\Test;
 
 use Mockery;
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Notifiable;
 use ElfSundae\BearyChat\Client;
 use ElfSundae\BearyChat\Message;
-use ElfSundae\BearyChat\Laravel\ClientManager;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
 use NotificationChannels\BearyChat\BearyChatChannel;
 use NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification;
 
