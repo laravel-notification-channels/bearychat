@@ -2,10 +2,10 @@
 
 namespace NotificationChannels\BearyChat\Test;
 
-use Orchestra\Testbench\TestCase as OrchestraCase;
 use Mockery;
 use GuzzleHttp\Client as HttpClient;
 use ElfSundae\BearyChat\Laravel\ClientManager;
+use Orchestra\Testbench\TestCase as OrchestraCase;
 
 class TestCase extends OrchestraCase
 {
