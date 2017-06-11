@@ -9,7 +9,7 @@
 [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/laravel-notification-channels/bearychat/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/laravel-notification-channels/bearychat/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/laravel-notification-channels/bearychat.svg?style=flat-square)](https://packagist.org/packages/laravel-notification-channels/bearychat)
 
-This package makes it easy to send notifications using [BearyChat][] with Laravel 5.3.
+This package makes it easy to send notifications using [BearyChat][] with Laravel 5.
 
 ## Contents
 
@@ -96,7 +96,7 @@ public function toBearyChat($notifiable)
 
 ### Routing Notifications
 
-To route BearyChat notifications to the proper Robot, define a `routeNotificationForBearyChat` method on your notifiable entity. 
+To route BearyChat notifications to the proper Robot, define a `routeNotificationForBearyChat` method on your notifiable entity.
 
 ```php
 class User extends Authenticatable
