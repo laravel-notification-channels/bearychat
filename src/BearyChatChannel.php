@@ -34,12 +34,17 @@ class BearyChatChannel
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
+     * @return void
      *
      * @throws \NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification
      */
     public function send($notifiable, Notification $notification)
     {
-        $message = $this->getMessage($notifiable, $notification);
+        $message = $notification->toBearyChat($notifiable);
+
+        if (! $message instanceof Message) {
+            throw CouldNotSendNotification::invalidMessage($message);
+        }
 
         $client = $message->getClient();
 
@@ -72,27 +77,6 @@ class BearyChatChannel
         if (! $client->sendMessage($message)) {
             throw CouldNotSendNotification::sendingFailed($client->getWebhook(), $message);
         }
-    }
-
-    /**
-     * Get the message from the given notification.
-     *
-     * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @return \ElfSundae\BearyChat\Message
-     *
-     * @throws \NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification if the
-     *             passed message is not an instance of \ElfSundae\BearyChat\Message
-     */
-    protected function getMessage($notifiable, Notification $notification)
-    {
-        $message = $notification->toBearyChat($notifiable);
-
-        if (! (is_object($message) && $message instanceof Message)) {
-            throw CouldNotSendNotification::invalidMessage($message);
-        }
-
-        return $message;
     }
 
     /**
