@@ -188,6 +188,6 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [BearyChat]: https://bearychat.com
 [Composer]: https://getcomposer.org
-[Laravel-BearyChat]: https://github.com/ElfSundae/Laravel-BearyChat
-[PHP-BearyChat]: https://github.com/ElfSundae/BearyChat
+[Laravel-BearyChat]: https://github.com/ElfSundae/laravel-bearychat
+[PHP-BearyChat]: https://github.com/ElfSundae/bearychat
 [Incoming]: https://bearychat.com/integrations/incoming
