@@ -2,14 +2,15 @@
 
 namespace NotificationChannels\BearyChat\Exceptions;
 
+use Exception;
 use ElfSundae\BearyChat\Message;
 
-class CouldNotSendNotification extends \Exception
+class CouldNotSendNotification extends Exception
 {
     /**
      * Thrown when an invalid message was passed.
      *
-     * @param  mixed $message
+     * @param  mixed  $message
      * @return static
      */
     public static function invalidMessage($message)
