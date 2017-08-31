@@ -32,13 +32,6 @@
             "NotificationChannels\\BearyChat\\Test\\": "tests"
         }
     },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "NotificationChannels\\BearyChat\\BearyChatServiceProvider"
-            ]
-        }
-    },
     "scripts": {
         "test": "vendor/bin/phpunit"
     },
