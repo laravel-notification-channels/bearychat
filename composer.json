@@ -13,15 +13,14 @@
     ],
     "require": {
         "php": ">=5.6.4",
-        "illuminate/notifications": "^5.3|^5.4",
-        "illuminate/support": "^5.1|^5.2|^5.3|^5.4",
-        "elfsundae/bearychat": "^1.1.12",
-        "elfsundae/laravel-bearychat": "^1.1.2"
+        "illuminate/notifications": "^5.3|^5.4|^5.5",
+        "illuminate/support": "5.*",
+        "elfsundae/laravel-bearychat": "^1.1.5"
     },
     "require-dev": {
-        "mockery/mockery": "^0.9.5",
+        "mockery/mockery": "0.9.*",
         "orchestra/testbench": "~3.0",
-        "phpunit/phpunit": "4.*"
+        "phpunit/phpunit": "~5.7"
     },
     "autoload": {
         "psr-4": {
@@ -31,6 +30,13 @@
     "autoload-dev": {
         "psr-4": {
             "NotificationChannels\\BearyChat\\Test\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "NotificationChannels\\BearyChat\\BearyChatServiceProvider"
+            ]
         }
     },
     "scripts": {
