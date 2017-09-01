@@ -1,6 +1,8 @@
-# Changelog
+# Release Notes
 
-All notable changes to `bearychat` will be documented in this file
+## [Unreleased]
+
+- Delete `NotificationChannels\BearyChat\BearyChatServiceProvider`
 
 ## 1.0.2 (2017-06-12)
 
