@@ -29,7 +29,7 @@ This package makes it easy to send notifications using [BearyChat][] with Larave
 
 ## Installation
 
-You can install the package via [Composer][]:
+You can install the package via [Composer](https://getcomposer.org):
 
 ```sh
 $ composer require laravel-notification-channels/bearychat
@@ -41,7 +41,7 @@ Once package is installed, you need to register the service provider by adding t
 ElfSundae\BearyChat\Laravel\ServiceProvider::class,
 ```
 
-This package is based on [Laravel-BearyChat][], then you may publish the config file if you have not done yet:
+This package is based on [laravel-bearychat][], then you may publish the config file if you have not done yet:
 
 ```sh
 $ php artisan vendor:publish --provider="ElfSundae\BearyChat\Laravel\ServiceProvider"
@@ -49,7 +49,7 @@ $ php artisan vendor:publish --provider="ElfSundae\BearyChat\Laravel\ServiceProv
 
 ### Setting up the BearyChat service
 
-You may create an Incoming Robot in your [BearyChat][] team account, and read the [payload format][Incoming].
+You may create an Incoming Robot in your [BearyChat][] team account, and read the [payload format][incoming].
 
 ## Usage
 
@@ -91,8 +91,8 @@ public function toBearyChat($notifiable)
 }
 ```
 
-> + For more details about BearyChat `Client` and `Message`, please [read the documentation][PHP-BearyChat] of the BearyChat PHP package.
-> + For more details about `BearyChat` facade or `bearychat()` helper function, please [read the documentation][Laravel-BearyChat] of the original Laravel package.
+> + For more details about BearyChat `Client` and `Message`, please [read the documentation][php-bearychat] of the BearyChat PHP package.
+> + For more details about `BearyChat` facade or `bearychat()` helper function, please [read the documentation][laravel-bearychat] of the original Laravel package.
 
 ### Routing Notifications
 
@@ -123,6 +123,8 @@ You can also route the user, channel or configured client in the `routeNotificat
 - `notification()` : (string) Message notification.
 - `markdown(true)` : (boolean) Indicates the message should be parsed as markdown syntax.
 - `add()` : (mixed) Add an attachment to the message. The parameter can be an payload array that contains all of attachment's fields. The parameters can also be attachment's fields that in order of "text", "title", "images" and "color".
+- `addImage()` : `($image, $desc = null, $title = null)` Add an image attachment to the message.
+- `content()` : `($text, $markdown, $notification)` or `($text, $attachment_text, $attachment_title, $attachment_images, $attachment_color)`.
 - `remove()` : (mixed) Remove attachment(s), you can pass an integer of attachment index, or an array of indices.
 - `channel()` : (string) The channel that the message should be sent to.
 - `user()` : (string) The user that the message should be sent to.
@@ -185,9 +187,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
-
 [BearyChat]: https://bearychat.com
-[Composer]: https://getcomposer.org
-[Laravel-BearyChat]: https://github.com/ElfSundae/laravel-bearychat
-[PHP-BearyChat]: https://github.com/ElfSundae/bearychat
-[Incoming]: https://bearychat.com/integrations/incoming
+[laravel-bearychat]: https://github.com/ElfSundae/laravel-bearychat
+[php-bearychat]: https://github.com/ElfSundae/bearychat
+[incoming]: https://bearychat.com/integrations/incoming
