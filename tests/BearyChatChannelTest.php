@@ -2,11 +2,13 @@
 
 namespace NotificationChannels\BearyChat\Test;
 
-use Mockery;
+use Mockery as m;
 use ElfSundae\BearyChat\Client;
+use PHPUnit\Framework\TestCase;
 use ElfSundae\BearyChat\Message;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
+use ElfSundae\BearyChat\Laravel\ClientManager;
 use NotificationChannels\BearyChat\BearyChatChannel;
 use NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification;
 
@@ -14,100 +16,142 @@ class BearyChatChannelTest extends TestCase
 {
     public function testInstantiation()
     {
-        $this->assertInstanceOf(BearyChatChannel::class, $this->getChannel());
+        $channel = new BearyChatChannel(m::mock(ClientManager::class));
+        $this->assertInstanceOf(BearyChatChannel::class, $channel);
     }
 
-    public function testNotificationCanBeSent()
+    public function testSendInvalidMessage()
     {
-        $client = $this->prepareClient();
+        $this->expectException(CouldNotSendNotification::class);
+        $this->expectExceptionCode(1);
+        $channel = new BearyChatChannel(m::mock(ClientManager::class));
+        $channel->send(new TestNotifiable, new TestNotification);
+    }
 
-        $client->shouldReceive('sendMessage')
+    public function testSendMessageWithClient()
+    {
+        $client = m::mock(Client::class)
+            ->shouldReceive('getMessageDefaults')
+            ->andReturn([])
+            ->shouldReceive('sendMessage')
             ->once()
-            ->with(Mockery::on(function ($argument) {
-                return $argument instanceof Message;
-            }))
-            ->andReturn(true);
-
-        $this->getChannel()
-            ->send(new TestNotifiable(), new TestNotification());
+            ->andReturn(true)
+            ->mock();
+        $channel = new BearyChatChannel(m::mock(ClientManager::class));
+        $channel->send(new TestNotifiable, new TestNotification(new Message($client)));
     }
 
-    public function testCouldNotSendNotificationExceptionForInvalidMessage()
+    public function testSendMessageFailed()
     {
-        $this->setExpectedException(CouldNotSendNotification::class);
-
-        $this->getChannel()
-            ->send(new TestNotifiable(), new TestNotification('foo'));
-    }
-
-    public function testCouldNotSendNotificationExceptionForSendingFailed()
-    {
-        $this->setExpectedException(CouldNotSendNotification::class);
-
-        $client = $this->prepareClient();
-
-        $client->shouldReceive('sendMessage')
-            ->andReturn(false);
-
-        $this->getChannel()
-            ->send(new TestNotifiable(), new TestNotification());
-    }
-
-    public function testMessageWhenNotifiableGivesUser()
-    {
-        $client = $this->prepareClient();
-
-        $client->shouldReceive('sendMessage')
+        $client = m::mock(Client::class)
+            ->shouldReceive('getMessageDefaults')
+            ->andReturn([])
+            ->shouldReceive('sendMessage')
             ->once()
-            ->with(Mockery::on(function ($message) {
-                return $message->getUser() === 'foo';
-            }))
-            ->andReturn(true);
-
-        $message = (new Message)->user('user');
-
-        $this->getChannel()
-            ->send(new TestNotifiable('@foo'), new TestNotification($message));
+            ->andReturn(false)
+            ->shouldReceive('getWebhook')
+            ->mock();
+        $this->expectException(CouldNotSendNotification::class);
+        $this->expectExceptionCode(4);
+        $channel = new BearyChatChannel(m::mock(ClientManager::class));
+        $channel->send(new TestNotifiable, new TestNotification(new Message($client)));
     }
 
-    public function testMessageWhenNotifiableGivesChannel()
+    public function testSendMessageWithoutClient()
     {
-        $client = $this->prepareClient();
+        $client = m::mock(Client::class)
+            ->shouldReceive('getMessageDefaults')
+            ->andReturn(['foo' => 'bar'])
+            ->shouldReceive('sendMessage')
+            ->andReturn(true)
+            ->mock();
+        $manager = m::mock(ClientManager::class)
+            ->shouldReceive('client')
+            ->with(null)
+            ->andReturn($client)
+            ->mock();
+        $message = m::mock(Message::class)
+            ->shouldReceive('getClient')
+            ->andReturn(null)
+            ->shouldReceive('configureDefaults')
+            ->with(['foo' => 'bar'], true)
+            ->andReturn(m::self())
+            ->mock();
+        $channel = new BearyChatChannel($manager);
+        $channel->send(new TestNotifiable, new TestNotification($message));
+    }
 
-        $client->shouldReceive('sendMessage')
+    public function testRouteToUser()
+    {
+        $client = m::mock(Client::class)
+            ->shouldReceive('getMessageDefaults')
+            ->andReturn([])
+            ->shouldReceive('sendMessage')
+            ->with(m::on(function ($message) {
+                return $message->getUser() == 'elf';
+            }))
+            ->andReturn(true)
+            ->mock();
+        $message = new Message($client);
+        $channel = new BearyChatChannel(m::mock(ClientManager::class));
+        $channel->send(new TestNotifiable('@elf'), new TestNotification($message));
+    }
+
+    public function testRouteToChannel()
+    {
+        $client = m::mock(Client::class)
+            ->shouldReceive('getMessageDefaults')
+            ->andReturn([])
+            ->shouldReceive('sendMessage')
+            ->with(m::on(function ($message) {
+                return $message->getChannel() == 'foobar';
+            }))
+            ->andReturn(true)
+            ->mock();
+        $message = new Message($client);
+        $channel = new BearyChatChannel(m::mock(ClientManager::class));
+        $channel->send(new TestNotifiable('#foobar'), new TestNotification($message));
+    }
+
+    public function testRouteToWebhook()
+    {
+        $client = m::mock(Client::class)
+            ->shouldReceive('getMessageDefaults')
+            ->andReturn([])
+            ->shouldReceive('webhook')
+            ->with('http://fake/webhook')
+            ->andReturn(m::self())
+            ->shouldReceive('sendMessage')
+            ->andReturn(true)
+            ->mock();
+        $message = new Message($client);
+        $channel = new BearyChatChannel(m::mock(ClientManager::class));
+        $channel->send(new TestNotifiable('http://fake/webhook'), new TestNotification($message));
+    }
+
+    public function testRouteToClientName()
+    {
+        $client = m::mock(Client::class)
+            ->shouldReceive('getMessageDefaults')
+            ->andReturn(['foo' => 'bar'])
+            ->shouldReceive('sendMessage')
+            ->andReturn(true)
+            ->mock();
+        $manager = m::mock(ClientManager::class)
+            ->shouldReceive('client')
+            ->with('foobar')
+            ->andReturn($client)
+            ->mock();
+        $message = m::mock(Message::class)
+            ->shouldReceive('getClient')
+            ->andReturn(null)
+            ->shouldReceive('configureDefaults')
+            ->with(['foo' => 'bar'], true)
             ->once()
-            ->with(Mockery::on(function ($message) {
-                return $message->getChannel() === 'foo';
-            }))
-            ->andReturn(true);
-
-        $message = (new Message)->channel('user');
-
-        $this->getChannel()
-            ->send(new TestNotifiable('#foo'), new TestNotification($message));
-    }
-
-    protected function getChannel()
-    {
-        return new BearyChatChannel($this->clientManager);
-    }
-
-    protected function getClient()
-    {
-        return Mockery::mock(Client::class)->makePartial();
-    }
-
-    protected function returnClientForClientManager($client)
-    {
-        $this->clientManager->shouldReceive('client')->andReturn($client);
-    }
-
-    protected function prepareClient()
-    {
-        $client = $this->getClient();
-        $this->returnClientForClientManager($client);
-
-        return $client;
+            ->andReturn(m::self())
+            ->mock();
+        $channel = new BearyChatChannel($manager);
+        $channel->send(new TestNotifiable('foobar'), new TestNotification($message));
     }
 }
 
@@ -134,7 +178,7 @@ class TestNotification extends Notification
 
     public function __construct($message = null)
     {
-        $this->message = is_null($message) ? (new Message)->text('text') : $message;
+        $this->message = $message;
     }
 
     public function toBearyChat($notifiable)
