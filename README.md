@@ -41,10 +41,10 @@ Once package is installed, you need to register the service provider by adding t
 ElfSundae\BearyChat\Laravel\ServiceProvider::class,
 ```
 
-This package is based on [laravel-bearychat][], then you may publish the config file if you have not done yet:
+This package is based on [laravel-bearychat][], you may publish the config file if you have not done yet:
 
 ```sh
-$ php artisan vendor:publish --provider="ElfSundae\BearyChat\Laravel\ServiceProvider"
+$ php artisan vendor:publish --tag=bearychat
 ```
 
 ### Setting up the BearyChat service
