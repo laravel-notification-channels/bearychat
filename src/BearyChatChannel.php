@@ -71,57 +71,11 @@ class BearyChatChannel
         if (is_null($client) || isset($clientName)) {
             $client = $this->clientManager->client(isset($clientName) ? $clientName : null);
 
-            $message = $this->applyMessageDefaultsFromClient($client, $message);
+            $message->configureDefaults($client->getMessageDefaults(), true);
         }
 
         if (! $client->sendMessage($message)) {
             throw CouldNotSendNotification::sendingFailed($client->getWebhook(), $message);
         }
-    }
-
-    /**
-     * Apply message defaults from a client to a message instance.
-     *
-     * @param  \ElfSundae\BearyChat\Client  $client
-     * @param  \ElfSundae\BearyChat\Message  $message
-     * @return \ElfSundae\BearyChat\Message
-     */
-    protected function applyMessageDefaultsFromClient(Client $client, Message $message)
-    {
-        static $globalDefaultsKeys = null;
-
-        if (is_null($globalDefaultsKeys)) {
-            $globalDefaultsKeys = [
-                MessageDefaults::CHANNEL,
-                MessageDefaults::USER,
-                MessageDefaults::MARKDOWN,
-                MessageDefaults::NOTIFICATION,
-            ];
-        }
-
-        foreach ($globalDefaultsKeys as $key) {
-            $method = Str::studly($key);
-
-            if (method_exists($message, $getMethod = 'get'.$method)) {
-                if (is_null($message->{$getMethod}())) {
-                    $message->{$method}($client->getMessageDefaults($key));
-                }
-            }
-        }
-
-        if (($attachmentColor = $client->getMessageDefaults(MessageDefaults::ATTACHMENT_COLOR))) {
-            $attachmentDefaults = [
-                'color' => $attachmentColor,
-            ];
-
-            // First we apply attachment defaults from the client to this message instance,
-            // then reset message's attachments via its `setAttachments` method which can
-            // handle its attachment defaults.
-
-            $message->setAttachmentDefaults($attachmentDefaults + $message->getAttachmentDefaults());
-            $message->setAttachments($message->getAttachments());
-        }
-
-        return $message;
     }
 }
