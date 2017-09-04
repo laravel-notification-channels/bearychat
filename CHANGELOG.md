@@ -1,8 +1,9 @@
 # Release Notes
 
-## [Unreleased]
+## 1.1.0 (2017-09-04)
 
 - Delete `NotificationChannels\BearyChat\BearyChatServiceProvider`
+- Add support to Laravel 5.5
 
 ## 1.0.2 (2017-06-12)
 
