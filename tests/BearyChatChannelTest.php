@@ -59,23 +59,18 @@ class BearyChatChannelTest extends TestCase
 
     public function testSendMessageWithoutClient()
     {
+        $message = new Message;
         $client = m::mock(Client::class)
             ->shouldReceive('getMessageDefaults')
-            ->andReturn(['foo' => 'bar'])
+            ->andReturn([])
             ->shouldReceive('sendMessage')
+            ->with($message)
+            ->once()
             ->andReturn(true)
             ->mock();
         $manager = m::mock(ClientManager::class)
             ->shouldReceive('client')
-            ->with(null)
             ->andReturn($client)
-            ->mock();
-        $message = m::mock(Message::class)
-            ->shouldReceive('getClient')
-            ->andReturn(null)
-            ->shouldReceive('configureDefaults')
-            ->with(['foo' => 'bar'], true)
-            ->andReturn(m::self())
             ->mock();
         $channel = new BearyChatChannel($manager);
         $channel->send(new TestNotifiable, new TestNotification($message));
@@ -90,6 +85,7 @@ class BearyChatChannelTest extends TestCase
             ->with(m::on(function ($message) {
                 return $message->getUser() == 'elf';
             }))
+            ->once()
             ->andReturn(true)
             ->mock();
         $message = new Message($client);
@@ -106,6 +102,7 @@ class BearyChatChannelTest extends TestCase
             ->with(m::on(function ($message) {
                 return $message->getChannel() == 'foobar';
             }))
+            ->once()
             ->andReturn(true)
             ->mock();
         $message = new Message($client);
@@ -122,6 +119,7 @@ class BearyChatChannelTest extends TestCase
             ->with('http://fake/webhook')
             ->andReturn(m::self())
             ->shouldReceive('sendMessage')
+            ->once()
             ->andReturn(true)
             ->mock();
         $message = new Message($client);
@@ -133,8 +131,9 @@ class BearyChatChannelTest extends TestCase
     {
         $client = m::mock(Client::class)
             ->shouldReceive('getMessageDefaults')
-            ->andReturn(['foo' => 'bar'])
+            ->andReturn([])
             ->shouldReceive('sendMessage')
+            ->once()
             ->andReturn(true)
             ->mock();
         $manager = m::mock(ClientManager::class)
@@ -142,14 +141,7 @@ class BearyChatChannelTest extends TestCase
             ->with('foobar')
             ->andReturn($client)
             ->mock();
-        $message = m::mock(Message::class)
-            ->shouldReceive('getClient')
-            ->andReturn(null)
-            ->shouldReceive('configureDefaults')
-            ->with(['foo' => 'bar'], true)
-            ->once()
-            ->andReturn(m::self())
-            ->mock();
+        $message = new Message;
         $channel = new BearyChatChannel($manager);
         $channel->send(new TestNotifiable('foobar'), new TestNotification($message));
     }

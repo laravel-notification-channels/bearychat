@@ -45,36 +45,26 @@ class BearyChatChannel
             throw CouldNotSendNotification::invalidMessage($message);
         }
 
-        $client = $message->getClient();
-
         if ($route = $notifiable->routeNotificationFor('BearyChat')) {
-
-            // Route can be an user, a channel, a webhook endpoint,
-            // or a client name which correspond to one of the clients
-            // listed in the BearyChat configuration file.
-
             if (Str::startsWith($route, ['@', '#'])) {
                 $message->to($route);
             } elseif (Str::startsWith($route, ['http://', 'https://'])) {
-                $client = $client ? $client->webhook($route) : new Client($route);
+                if ($client = $message->getClient()) {
+                    $client->webhook($route);
+                } else {
+                    $message->setClient(new Client($route));
+                }
             } else {
-                $clientName = $route;
+                $message->setClient($this->clientManager->client($route));
             }
         }
 
-        // If the message is not created from a client, or the notifiable object
-        // provides a different client to send this message, we should obtain
-        // the client via the ClientManager and apply any message defaults from
-        // this client to the message instance.
-
-        if (is_null($client) || isset($clientName)) {
-            $client = $this->clientManager->client(isset($clientName) ? $clientName : null);
-
-            $message->configureDefaults($client->getMessageDefaults(), true);
+        if (is_null($message->getClient())) {
+            $message->setClient($this->clientManager->client());
         }
 
-        if (! $client->sendMessage($message)) {
-            throw CouldNotSendNotification::sendingFailed($client->getWebhook(), $message);
+        if (! $message->send()) {
+            throw CouldNotSendNotification::sendingFailed($message->getClient()->getWebhook(), $message);
         }
     }
 }
