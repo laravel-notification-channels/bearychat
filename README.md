@@ -35,7 +35,7 @@ You can install the package via [Composer](https://getcomposer.org):
 $ composer require laravel-notification-channels/bearychat
 ```
 
-Once package is installed, you need to register the service provider by adding the following to the `providers` array in `config/app.php`:
+Once the package is installed, you need to register the service provider by adding the following to the `providers` array in `config/app.php`:
 
 ```php
 ElfSundae\BearyChat\Laravel\ServiceProvider::class,
