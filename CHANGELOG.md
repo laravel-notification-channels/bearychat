@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.2.1 (2019-09-15)
+
+- Add support for Laravel 6
+
 ## 1.2.0 (2018-02-11)
 
 - Add support for Laravel 5.6
