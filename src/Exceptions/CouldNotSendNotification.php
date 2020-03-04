@@ -2,8 +2,8 @@
 
 namespace NotificationChannels\BearyChat\Exceptions;
 
-use Exception;
 use ElfSundae\BearyChat\Message;
+use Exception;
 
 class CouldNotSendNotification extends Exception
 {

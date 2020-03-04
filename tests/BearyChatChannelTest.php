@@ -2,15 +2,15 @@
 
 namespace NotificationChannels\BearyChat\Test;
 
-use Mockery as m;
 use ElfSundae\BearyChat\Client;
-use PHPUnit\Framework\TestCase;
+use ElfSundae\BearyChat\Laravel\ClientManager;
 use ElfSundae\BearyChat\Message;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
-use ElfSundae\BearyChat\Laravel\ClientManager;
+use Mockery as m;
 use NotificationChannels\BearyChat\BearyChatChannel;
 use NotificationChannels\BearyChat\Exceptions\CouldNotSendNotification;
+use PHPUnit\Framework\TestCase;
 
 class BearyChatChannelTest extends TestCase
 {
