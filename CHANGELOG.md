@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.4.0 (2020-09-13)
+
+- Add support for Laravel 8
+
 ## 1.3.0 (2020-03-04)
 
 - Add support for Laravel 7
