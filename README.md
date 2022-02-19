@@ -11,6 +11,10 @@
 
 This package makes it easy to send notifications using [BearyChat][] with Laravel.
 
+## Channel Deprecated
+
+BearyChat was discontinued. As such, this channel will no longer receive updates and is being deprecated.
+
 ## Contents
 
 - [Installation](#installation)
